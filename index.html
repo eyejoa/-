@@ -211,7 +211,7 @@
       </div>
       <div class="header-meta">
         <div>발행일: 2024. 03. 16</div>
-        <div>대상: 교육 참여 멘티 177명</div>
+        <div>대상: 교육 멘티 177명</div>
       </div>
     </div>
   </header>
@@ -219,7 +219,7 @@
   <!-- 핵심 요약 섹션 -->
   <section class="section animate-in" style="animation-delay: 0.1s;">
     <div class="section-eyebrow">Executive Summary</div>
-    <div class="section-title">교육 성과 핵심 지표</div>
+    <div class="section-title">이번 교육, 숫자로 보면 이렇습니다</div>
     <div class="summary-grid">
       <div class="summary-item">
         <div class="summary-num">84.2%</div>
@@ -265,11 +265,11 @@
     </div>
   </section>
 
-  <!-- 상세 분석 3: 레벨별 카드 -->
+  <!-- 상세 분석 3: 사전 진단 레벨별 성취도 분석 (수정됨) -->
   <section class="section animate-in" style="animation-delay: 0.4s;">
     <div class="section-header">
       <div class="section-eyebrow">Section 03</div>
-      <div class="section-title">진단 레벨별 상세 성취도</div>
+      <div class="section-title">사전 진단 레벨별 성취도 분석</div>
     </div>
     <div class="level-grid" id="level-container">
       <!-- JS에서 렌더링 -->
@@ -294,10 +294,10 @@
   const improvementDist = [
     { label: '점수 하락',    count: 17, percent: 9.6,  color: '#cbd5e1' },
     { label: '변화 없음',    count: 11, percent: 6.2,  color: '#94a3b8' },
-    { label: '1~9점 ↑',    count: 80, percent: 45.2, color: '#93c5fd' },
-    { label: '10점대 ↑',   count: 42, percent: 23.7, color: '#60a5fa' },
-    { label: '20점대 ↑',   count: 20, percent: 11.3, color: '#3b82f6' },
-    { label: '30점 이상 ↑', count: 7,  percent: 3.9,  color: '#4338ca' },
+    { label: '1~9점 향상',  count: 80, percent: 45.2, color: '#93c5fd' },
+    { label: '10점대 향상', count: 42, percent: 23.7, color: '#60a5fa' },
+    { label: '20점대 향상', count: 20, percent: 11.3, color: '#3b82f6' },
+    { label: '30점 이상 향상', count: 7,  percent: 3.9,  color: '#4338ca' },
   ];
 
   const levelData = [
@@ -324,7 +324,7 @@
         <div class="bar-row">
           <div class="bar-label">
             <div class="bar-label-main">${item.range}</div>
-            <div class="bar-label-sub">${item.count}명 참여</div>
+            <div class="bar-label-sub">${item.count}명</div>
           </div>
           <div class="bar-track">
             <div class="bar-fill" style="width:${pct}%; background:${item.color};"></div>
@@ -410,7 +410,7 @@
         <div class="level-card">
           <div class="level-badge">LEVEL ${item.id}</div>
           <div class="level-name">${item.name}</div>
-          <div class="level-count">${item.count}명 참여</div>
+          <div class="level-count">${item.count}명</div>
           <div class="level-score">${item.score}</div>
           <div class="level-score-label">평균 향상 점수</div>
         </div>`;
