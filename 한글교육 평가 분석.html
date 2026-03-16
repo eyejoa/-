@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한글교육 성과 분석 보고서</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo: #4338ca;
+      --indigo-light: #eef2ff;
+      --text-1: #0f0e17;
+      --text-2: #4a4868;
+      --text-3: #9591b0;
+      --surface: #ffffff;
+      --surface-2: #f7f7fb;
+      --surface-3: #f0f0f8;
+      --border: rgba(67,56,202,0.1);
+      --border-strong: rgba(67,56,202,0.22);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f4f4fa;
+      color: var(--text-1);
+      padding: 32px 20px 60px;
+      min-height: 100vh;
+    }
+
+    #report-root { max-width: 820px; margin: 0 auto; }
+
+    .pdf-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 20px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border-radius: 99px;
+      background: var(--indigo); color: #fff; border: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .pdf-btn:hover { background: #3730a3; transform: translateY(-1px); }
+    .pdf-btn:active { transform: scale(0.97); }
+
+    /* 헤더 */
+    .header {
+      background: var(--indigo);
+      border-radius: var(--radius);
+      padding: 36px 40px;
+      margin-bottom: 16px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute;
+      right: -50px; top: -50px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .header::after {
+      content: ''; position: absolute;
+      right: 80px; bottom: -70px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .header-inner { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+    .header-eyebrow { font-size: 10px; font-family: 'DM Mono', monospace; opacity: 0.5; letter-spacing: 0.12em; margin-bottom: 10px; }
+    .header-title { font-size: 23px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.25; }
+    .header-meta { text-align: right; font-size: 12px; opacity: 0.6; line-height: 2; font-family: 'DM Sans', sans-serif; }
+
+    /* 섹션 공통 */
+    .section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .section-header { margin-bottom: 22px; }
+    .section-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--indigo); letter-spacing: 0.1em; margin-bottom: 4px; opacity: 0.7; }
+    .section-title { font-size: 15px; font-weight: 700; color: var(--text-1); letter-spacing: -0.02em; }
+    .section-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; font-weight: 300; }
+
+    /* 섹션 1 바 */
+    .bar-row { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--surface-3); }
+    .bar-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .bar-row:first-child { padding-top: 0; }
+    .bar-label { min-width: 110px; }
+    .bar-label-main { font-size: 13px; color: var(--text-2); font-weight: 500; }
+    .bar-label-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; font-family: 'DM Sans', sans-serif; }
+    .bar-track { flex: 1; background: var(--surface-3); border-radius: 99px; height: 7px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; }
+    .bar-value { min-width: 90px; text-align: right; font-size: 13px; font-weight: 600; color: var(--indigo); font-family: 'DM Sans', sans-serif; letter-spacing: -0.01em; }
+
+    /* 섹션 2 */
+    .chart-section { background: var(--surface-2); }
+    .chart-stat-row { display: flex; justify-content: space-around; margin-bottom: 4px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .chart-stat { text-align: center; }
+    .chart-stat-num { font-size: 15px; font-weight: 700; color: var(--text-1); font-family: 'DM Sans', sans-serif; letter-spacing: -0.02em; }
+    .chart-stat-pct { font-size: 10px; color: var(--text-3); margin-top: 1px; font-family: 'DM Sans', sans-serif; }
+    .chart-note { text-align: center; font-size: 11px; color: var(--text-3); margin-top: 10px; font-weight: 300; }
+
+    /* 섹션 3 레벨 카드 */
+    .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .level-card {
+      background: var(--surface-2); border-radius: var(--radius-sm);
+      padding: 18px 16px; border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .level-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .level-badge {
+      display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px;
+      color: var(--indigo); background: var(--indigo-light);
+      padding: 3px 8px; border-radius: 99px; letter-spacing: 0.05em; margin-bottom: 10px;
+    }
+    .level-name { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 2px; }
+    .level-count { font-size: 11px; color: var(--text-3); font-family: 'DM Sans', sans-serif; }
+    .level-score { font-size: 28px; font-weight: 700; color: var(--indigo); font-family: 'DM Sans', sans-serif; letter-spacing: -0.03em; margin-top: 12px; line-height: 1; }
+    .level-score-label { font-size: 10px; color: var(--text-3); margin-top: 4px; font-weight: 300; }
+
+    /* 모달 */
+    #print-guide { display: none; position: fixed; inset: 0; background: rgba(15,14,23,0.5); z-index: 999; align-items: center; justify-content: center; }
+    #print-guide.show { display: flex; }
+    .guide-box { background: #fff; border-radius: var(--radius); padding: 32px 36px; max-width: 400px; width: 90%; border: 1px solid var(--border); }
+    .guide-box h2 { font-size: 17px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em; }
+    .guide-steps { font-size: 13px; color: var(--text-2); line-height: 2.2; margin-bottom: 24px; font-weight: 300; }
+    .guide-steps strong { color: var(--text-1); font-weight: 600; }
+    .guide-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-cancel { padding: 8px 18px; font-size: 13px; border-radius: 99px; border: 1px solid var(--border-strong); background: transparent; cursor: pointer; color: var(--text-2); font-family: 'DM Sans', sans-serif; }
+    .btn-go { padding: 8px 20px; font-size: 13px; border-radius: 99px; border: none; background: var(--indigo); color: #fff; cursor: pointer; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+
+    @media print {
+      .no-print { display: none !important; }
+      #print-guide { display: none !important; }
+      body { background: #fff !important; padding: 0 !important; }
+      #report-root { max-width: 100% !important; }
+      .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .bar-fill, .level-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    /* 요약 카드 */
+    .summary-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 26px 32px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .summary-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .summary-num {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--indigo);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+    .summary-desc {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    .summary-desc strong { color: var(--text-1); font-weight: 600; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .header          { animation: fadeUp 0.45s ease both; }
+    .summary-section { animation: fadeUp 0.45s ease both; animation-delay: 0.05s; }
+    .section         { animation: fadeUp 0.45s ease both; }
+    .section:nth-child(3) { animation-delay: 0.10s; }
+    .section:nth-child(4) { animation-delay: 0.17s; }
+    .section:nth-child(5) { animation-delay: 0.24s; }
+  </style>
+</head>
+<body>
+
+<div id="print-guide">
+  <div class="guide-box">
+    <h2>PDF로 저장하기</h2>
+    <div class="guide-steps">
+      1. <strong>"인쇄 열기"</strong>를 클릭합니다.<br>
+      2. 프린터 목록에서 <strong>"PDF로 저장"</strong>을 선택합니다.<br>
+      3. 용지 크기: <strong>A4</strong><br>
+      4. <strong>"배경 그래픽 인쇄"</strong> 체크 (색상 출력)<br>
+      5. <strong>"저장"</strong>을 눌러 완료합니다.
+    </div>
+    <div class="guide-actions">
+      <button class="btn-cancel" onclick="document.getElementById('print-guide').classList.remove('show')">취소</button>
+      <button class="btn-go" onclick="document.getElementById('print-guide').classList.remove('show'); setTimeout(()=>window.print(),80)">인쇄 열기</button>
+    </div>
+  </div>
+</div>
+
+<div id="report-root">
+
+  <div class="no-print" style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+    <button class="pdf-btn" onclick="document.getElementById('print-guide').classList.add('show')">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1v8M4 6l3 3 3-3M2 10v1.5A1.5 1.5 0 003.5 13h7A1.5 1.5 0 0012 11.5V10"
+          stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      PDF 다운로드
+    </button>
+  </div>
+
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <div class="header-eyebrow">PERFORMANCE REPORT</div>
+        <div class="header-title">다문화 랜선 한글교육 성과 분석 보고서</div>
+      </div>
+      <div class="header-meta">
+        <div>2024. 03. 16</div>
+        <div>교육 참여 멘티 177명</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 요약 -->
+  <div class="summary-section">
+    <div class="section-eyebrow">KEY FINDINGS · 핵심 요약</div>
+    <div class="section-title">이번 교육, 숫자로 보면 이렇습니다</div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-num">84.2%</div>
+        <div class="summary-desc"><strong>177명 중 149명</strong>이 교육 후<br>점수가 향상되었습니다</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">39%</div>
+        <div class="summary-desc"><strong>69명</strong>이 10점 이상 향상.<br>의미 있는 실력 변화를 경험했습니다</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-num">+12.75점</div>
+        <div class="summary-desc"><strong>"의사소통 어려움" 단계 레벨 4 학생</strong> 평균 향상.<br>가장 점수가 낮았던 학생이 가장 크게 성장했습니다</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-eyebrow">SECTION 01 · 출발점이 성과에 미친 영향</div>
+      <div class="section-title">사전 점수 구간별 성취도</div>
+      <div class="section-sub">사전 테스트 점수대별로 교육 후 몇점이 올랐는지 보여줍니다</div>
+      <div style="margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--indigo);">처음 점수가 낮을수록 교육 효과가 더 크게 나타났습니다</div>
+    </div>
+    <div id="bars-container"></div>
+  </div>
+
+  <div class="section chart-section">
+    <div class="section-header">
+      <div class="section-eyebrow">SECTION 02 · 전체 멘티의 성과 분포</div>
+      <div class="section-title">향상 점수 구간별 분포</div>
+      <div class="section-sub">177명 전체 중 얼마나 많은 멘티가 얼마나 올랐는지 보여줍니다</div>
+      <div style="margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--indigo);">149명이 교육 후 점수가 향상되었습니다</div>
+    </div>
+    <div class="chart-stat-row" id="chart-labels"></div>
+    <div style="position:relative; height:220px;">
+      <canvas id="improvChart"></canvas>
+    </div>
+    <p class="chart-note">※ 인원 비중에 따른 정규 분포 형태 확인 가능</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-eyebrow">SECTION 03</div>
+      <div class="section-title">레벨별 성취도 분석</div>
+      <div class="section-sub">진단 레벨 기준 · 레벨별 점수 증가 인원 및 증가 점수</div>
+    </div>
+    <div class="level-grid">
+      <div class="level-card">
+        <div class="level-badge">LEVEL 1</div>
+        <div class="level-name">원어민 수준</div>
+        <div class="level-count">35명</div>
+        <div class="level-score">+9.64</div>
+        <div class="level-score-label">평균 증가 점수</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge">LEVEL 2</div>
+        <div class="level-name">원만한 소통</div>
+        <div class="level-count">68명</div>
+        <div class="level-score">+9.01</div>
+        <div class="level-score-label">평균 증가 점수</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge">LEVEL 3</div>
+        <div class="level-name">기본적인 소통</div>
+        <div class="level-count">41명</div>
+        <div class="level-score">+9.26</div>
+        <div class="level-score-label">평균 증가 점수</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge">LEVEL 4</div>
+        <div class="level-name">의사소통 어려움</div>
+        <div class="level-count">33명</div>
+        <div class="level-score">+12.75</div>
+        <div class="level-score-label">평균 증가 점수</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const preTestData = [
+  { range: '0~9점대',  count: 4,  improvement: 35.39, color: '#f43f5e' },
+  { range: '20점대',   count: 7,  improvement: 28.45, color: '#f97316' },
+  { range: '30점대',   count: 28, improvement: 11.75, color: '#eab308' },
+  { range: '40점대',   count: 41, improvement: 12.64, color: '#22c55e' },
+  { range: '50점대',   count: 75, improvement: 7.08,  color: '#3b82f6' },
+  { range: '60점대+',  count: 22, improvement: 1.44,  color: '#8b5cf6' },
+];
+const barsEl = document.getElementById('bars-container');
+preTestData.forEach(item => {
+  const pct = (item.improvement / 36) * 100;
+  barsEl.innerHTML += `
+    <div class="bar-row">
+      <div class="bar-label">
+        <div class="bar-label-main">사전점수 ${item.range}</div>
+        <div class="bar-label-sub">${item.count}명</div>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%; background:${item.color};"></div>
+      </div>
+      <div class="bar-value">+${item.improvement}점 향상</div>
+    </div>`;
+});
+
+const improvementDist = [
+  { label: '점수 하락',    count: 17, percent: 9.6,  color: '#cbd5e1' },
+  { label: '점수 동일',    count: 11, percent: 6.2,  color: '#94a3b8' },
+  { label: '1~9점 향상',  count: 80, percent: 45.2, color: '#93c5fd' },
+  { label: '10점대 향상', count: 42, percent: 23.7, color: '#60a5fa' },
+  { label: '20점대 향상', count: 20, percent: 11.3, color: '#3b82f6' },
+  { label: '30점대+',     count: 7,  percent: 3.9,  color: '#4338ca' },
+];
+const labelsEl = document.getElementById('chart-labels');
+improvementDist.forEach(item => {
+  labelsEl.innerHTML += `
+    <div class="chart-stat">
+      <div class="chart-stat-num">${item.count}명</div>
+      <div class="chart-stat-pct">${item.percent}%</div>
+    </div>`;
+});
+
+new Chart(document.getElementById('improvChart'), {
+  type: 'bar',
+  data: {
+    labels: improvementDist.map(d => d.label),
+    datasets: [{
+      data: improvementDist.map(d => d.count),
+      backgroundColor: improvementDist.map(d => d.color),
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: {
+      x: { ticks: { font: { size: 11 }, autoSkip: false, color: '#9591b0' }, grid: { display: false }, border: { display: false } },
+      y: { ticks: { callback: v => v + '명', font: { size: 11 }, color: '#9591b0' }, grid: { color: 'rgba(67,56,202,0.06)' }, border: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
